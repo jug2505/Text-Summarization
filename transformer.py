@@ -18,7 +18,6 @@ class TextNormalizer:
 
     def __init__(self):
         self.stopwords = set(nltk.corpus.stopwords.words('russian'))
-        self.stemmer = SnowballStemmer('russian')
 
     @staticmethod
     def is_punct(token):
@@ -34,18 +33,13 @@ class TextNormalizer:
         """
         return token.lower() in self.stopwords
 
-    def stemming(self, token):
-        """
-        Непосредственно стемминг
-        """
-        return self.stemmer.stem(token)
 
     def normalize(self, sent):
         """
-        Нормализация стеммингом
+        Нормализация
         """
         return [
-            self.stemming(token)
+            token.lower()
             for token in sent
             if not self.is_stopword(token) and not self.is_punct(token)
         ]
