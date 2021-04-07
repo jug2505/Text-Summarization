@@ -133,3 +133,105 @@ y_val = np.array(pd.DataFrame({'p': val_summary})['p'].apply(lambda x: 'SOL ' + 
 
 x_test = np.array(pd.DataFrame({'p': test_text})['p'].apply(lambda x: 'SOL ' + x + ' EOL'))
 y_test = np.array(pd.DataFrame({'p': test_summary})['p'].apply(lambda x: 'SOL ' + x + ' EOL'))
+
+# Токенизация
+from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
+
+x_tokenizer = Tokenizer()
+x_tokenizer.fit_on_texts(list(x_train))
+
+# TODO: Возможно, на 4 поменять, если медленно обучаться будет
+thresh = 4
+
+cnt = 0
+tot_cnt = 0
+freq = 0
+tot_freq = 0
+
+for key, value in x_tokenizer.word_counts.items():
+    tot_cnt = tot_cnt + 1
+    tot_freq = tot_freq + value
+    if (value < thresh):
+        cnt = cnt + 1
+        freq = freq + value
+
+print("% редких слов в словаре: ", (cnt / tot_cnt) * 100)
+print("Общее покрытие редкими словами: ", (freq / tot_freq) * 100)
+
+x_tokenizer = Tokenizer(num_words=tot_cnt-cnt)
+x_tokenizer.fit_on_texts(list(x_train))
+
+x_tr_seq = x_tokenizer.texts_to_sequences(x_train)
+x_val_seq = x_tokenizer.texts_to_sequences(x_val)
+
+x_tr = pad_sequences(x_tr_seq,  maxlen=max_text_len, padding='post')
+x_val = pad_sequences(x_val_seq, maxlen=max_text_len, padding='post')
+
+x_voc = x_tokenizer.num_words + 1
+
+print(x_voc)
+
+
+# Токенизатор для тренировочных данных
+y_tokenizer = Tokenizer()
+y_tokenizer.fit_on_texts(list(y_train))
+
+thresh = 6
+
+cnt = 0
+tot_cnt = 0
+freq = 0
+tot_freq = 0
+
+for key, value in y_tokenizer.word_counts.items():
+    tot_cnt = tot_cnt + 1
+    tot_freq = tot_freq + value
+    if (value < thresh):
+        cnt = cnt + 1
+        freq = freq + value
+
+print("% редких слов в словаре:", (cnt / tot_cnt) * 100)
+print("Общее покрытие редкими словами:", (freq / tot_freq) * 100)
+
+y_tokenizer = Tokenizer(num_words=tot_cnt-cnt)
+y_tokenizer.fit_on_texts(list(y_train))
+
+y_tr_seq = y_tokenizer.texts_to_sequences(y_train)
+y_val_seq = y_tokenizer.texts_to_sequences(y_val)
+
+y_tr = pad_sequences(y_tr_seq, maxlen=max_summary_len, padding='post')
+y_val = pad_sequences(y_val_seq, maxlen=max_summary_len, padding='post')
+
+y_voc = y_tokenizer.num_words +1
+
+print((y_tokenizer.word_counts['SOL'], len(y_tr)))
+
+
+# Удаление предложений, содержащих только SOL и EOL
+
+ind = []
+for i in range(len(y_tr)):
+    cnt = 0
+    for j in y_tr[i]:
+        if j != 0:
+            cnt = cnt+1
+    if(cnt == 2):
+        ind.append(i)
+
+y_tr = np.delete(y_tr, ind, axis=0)
+x_tr = np.delete(x_tr, ind, axis=0)
+
+ind = []
+for i in range(len(y_val)):
+    cnt = 0
+    for j in y_val[i]:
+        if j != 0:
+            cnt = cnt+1
+    if(cnt == 2):
+        ind.append(i)
+
+y_val = np.delete(y_val, ind, axis=0)
+x_val = np.delete(x_val, ind, axis=0)
+
+# Построение модели
