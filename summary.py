@@ -258,28 +258,27 @@ if __name__ == 'main':
     sum_index_word = y_tokenizer.index_word
     text_index_word = x_tokenize.index_word
     sum_word_index = y_tokenizer.word_index
-
+    # Кодирование входной последовательности, настройка вывода
     encoder_model = Model(inputs=encoder_inputs_layer, outputs=[encoder_outputs, state_h, state_c])
-
-    decoder_state_input_h = Input(shape=(latent_dimensions,))
-    decoder_state_input_c = Input(shape=(latent_dimensions,))
+    # Настройка декодировщика
+    # Будут сохранять состояния с предыдущих временных шагов
+    decoder_input_h = Input(shape=(latent_dimensions,))
+    decoder_input_c = Input(shape=(latent_dimensions,))
     decoder_hidden_state_input = Input(shape=(max_text_len, latent_dimensions))
-
-    dec_emb2= decoder_embedding_layer(decoder_inputs_layer)
-
-    decoder_outputs2, state_h2, state_c2 = decoder_lstm_layer(dec_emb2, initial_state=[decoder_state_input_h, decoder_state_input_c])
-
-
-    attn_out_inf, attn_states_inf = attention_layer([decoder_hidden_state_input, decoder_outputs2])
-    decoder_inf_concat = Concatenate(axis=-1, name='concat')([decoder_outputs2, attn_out_inf])
-
-
-    decoder_outputs2 = decoder_dense_layer(decoder_inf_concat)
-
-
+    # Получение вложений последовательности с декодеровщика
+    decoder_embedding_2 = decoder_embedding_layer(decoder_inputs_layer)
+    # Для предсказания следующего слова в последовательности
+    # устанавливаю начальные состояния равными состояниям с предыдущего временного шага
+    decoder_outputs_2, state_h2, state_c2 = decoder_lstm_layer(decoder_embedding_2, initial_state=[decoder_input_h, decoder_input_c])
+    # Вывод со слоя внимания
+    attention_out_inf, attention_states_inf = attention_layer([decoder_hidden_state_input, decoder_outputs_2])
+    decoder_concat = Concatenate(axis=-1, name='concat')([decoder_outputs_2, attention_out_inf])
+    # Слой softmax
+    decoder_outputs_2 = decoder_dense_layer(decoder_concat)
+    # Финальная модель декодеровщика
     decoder_model = Model(
-        [decoder_inputs_layer] + [decoder_hidden_state_input, decoder_state_input_h, decoder_state_input_c],
-        [decoder_outputs2] + [state_h2, state_c2])
+        [decoder_inputs_layer] + [decoder_hidden_state_input, decoder_input_h, decoder_input_c],
+        [decoder_outputs_2] + [state_h2, state_c2])
 
     for i in range(0,100):
         print("Review:",seq2text(x_tr[i]))
