@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
-from rnn import SummarizerRNN
+from seq2seq import Summarizer
 from news_loader import fit_text
 import numpy as np
 
@@ -27,7 +27,7 @@ def main():
     data_dir_path = './corpus'
 
     print('Загрузка jsonl файла ...')
-    df = pd.read_json(data_dir_path + "/train.jsonl", lines=True)[:1000]
+    df = pd.read_json(data_dir_path + "/train.jsonl", lines=True)[:10000]
 
     y = df['summary']
     x = df['text']
@@ -36,7 +36,7 @@ def main():
     settings = fit_text(x, y)
     print('Файл настройки создан ...')
 
-    summarizer = SummarizerRNN(settings)
+    summarizer = Summarizer(settings)
 
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
 
@@ -44,7 +44,7 @@ def main():
     print('Размер тестовых данных: ', len(x_test))
 
     print('Начало обучения ...')
-    history = summarizer.fit(x_train, y_train, x_test, y_test, epochs=100, batch_size=20)
+    history = summarizer.fit(x_train, y_train, x_test, y_test, epochs=10, batch_size=20)
 
     create_history_plot(history, summarizer.model_name, metrics={'loss'})
 
