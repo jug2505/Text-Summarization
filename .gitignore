@@ -1,2 +1,5 @@
 /corpus/
-/test.py
+/corpus_full/
+/models/
+/reports/
+/test_files/
