@@ -1,7 +1,8 @@
 from collections import Counter
+import nltk
 
-MAX_INPUT_SEQ_LENGTH = 500
-MAX_TARGET_SEQ_LENGTH = 50
+MAX_INPUT_SEQ_LENGTH = 502
+MAX_TARGET_SEQ_LENGTH = 52
 MAX_INPUT_VOCAB_SIZE = 5000
 MAX_TARGET_VOCAB_SIZE = 2000
 
@@ -13,6 +14,8 @@ def fit_text(x, y, input_seq_max_length=MAX_INPUT_SEQ_LENGTH, output_seq_max_len
     max_length_output = 0
 
     for line in x:
+        tokens = [w.strip('.,:;?«»') for w in line.split(' ')]
+        line = " ".join(tokens)
         text = [word.lower() for word in line.split(' ')]
         seq_length = len(text)
         if seq_length > input_seq_max_length:
@@ -23,6 +26,8 @@ def fit_text(x, y, input_seq_max_length=MAX_INPUT_SEQ_LENGTH, output_seq_max_len
         max_length_input = max(max_length_input, seq_length)
 
     for line in y:
+        tokens = [w.strip('.,:;?«»') for w in line.split(' ')]
+        line = " ".join(tokens)
         line2 = 'START ' + line.lower() + ' END'
         text = [word for word in line2.split(' ')]
         seq_length = len(text)

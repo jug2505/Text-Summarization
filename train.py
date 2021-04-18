@@ -6,18 +6,11 @@ from news_loader import fit_text
 import numpy as np
 
 
-def create_history_plot(history, model_name, metrics=None):
+def create_history_plot(history, model_name):
     plt.title(model_name)
-    if metrics is None:
-        metrics = {'acc', 'loss'}
-    if 'acc' in metrics:
-        plt.plot(history.history['acc'], color='g', label='Train Accuracy')
-        plt.plot(history.history['val_acc'], color='b', label='Validation Accuracy')
-    if 'loss' in metrics:
-        plt.plot(history.history['loss'], color='r', label='Train Loss')
-        plt.plot(history.history['val_loss'], color='m', label='Validation Loss')
+    plt.plot(history.history['loss'], color='r', label='Train')
+    plt.plot(history.history['val_loss'], color='m', label='Validation')
     plt.legend(loc='best')
-
     plt.tight_layout()
     plt.show()
 
@@ -27,7 +20,7 @@ def main():
     data_dir_path = './corpus'
 
     print('Загрузка jsonl файла ...')
-    df = pd.read_json(data_dir_path + "/train.jsonl", lines=True)[:10000]
+    df = pd.read_json(data_dir_path + "/train.jsonl", lines=True)
 
     y = df['summary']
     x = df['text']
@@ -46,7 +39,7 @@ def main():
     print('Начало обучения ...')
     history = summarizer.fit(x_train, y_train, x_test, y_test, epochs=10, batch_size=20)
 
-    create_history_plot(history, summarizer.model_name, metrics={'loss'})
+    create_history_plot(history, summarizer.model_name)
 
 
 if __name__ == '__main__':

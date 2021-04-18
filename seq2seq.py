@@ -6,7 +6,7 @@ from keras.callbacks import ModelCheckpoint
 import numpy as np
 import os
 
-HIDDEN_UNITS = 100
+HIDDEN_UNITS = 500
 VERBOSE = 1
 
 
@@ -100,7 +100,7 @@ class Summarizer(object):
                 decoder_input_data_batch = np.zeros(shape=(batch_size, self.max_length_output, self.number_output_words))
                 for lineIdx, target_words in enumerate(y[start:end]):
                     for idx, w in enumerate(target_words):
-                        w2idx = 0  # default [UNK]
+                        w2idx = 0
                         if w in self.output_word_to_index:
                             w2idx = self.output_word_to_index[w]
                         if w2idx != 0:
@@ -152,7 +152,7 @@ class Summarizer(object):
         input_seq = []
         input_wids = []
         for word in input_text.lower().split(' '):
-            idx = 1  # default [UNK]
+            idx = 1
             if word in self.input_word_to_index:
                 idx = self.input_word_to_index[word]
             input_wids.append(idx)
