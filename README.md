@@ -8,3 +8,5 @@ seq2seq.py - Summarizer (Работает намного лучше, чем Summ
 news_loader.py - Предварительная обработка и загрузка корпуса
 
 train.py - Обучение / predict.py - Тест
+
+textrank.py - Реферирование с помощью алгоритма TextRank
