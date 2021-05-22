@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from matplotlib import pyplot as plt
 from seq2seq import Summarizer
-from news_loader import fit_text
+from news_loader import NewsLoader
 import numpy as np
 
 
@@ -26,7 +26,7 @@ def main():
     x = df['text']
 
     print('Создание файла настройки ...')
-    settings = fit_text(x, y)
+    settings = NewsLoader.fit_text(x, y)
     print('Файл настройки создан ...')
 
     summarizer = Summarizer(settings)
